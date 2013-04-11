@@ -1,11 +1,13 @@
+
 var map, map2;
 var mainArray = [];
 var windows = [];
 function initialize() {
-    var latlng = new google.maps.LatLng(46.199,5.21666);
-    var latlng2 = new google.maps.LatLng(21.1144,55.5325);
+	var latlng = new google.maps.LatLng(46.199,5.21666);
+    	var latlng2 = new google.maps.LatLng(-21.1144,55.5325);
 	
 	var mapOptions = {
+		zoom:5,
 		center: latlng,
 		mapTypeId: google.maps.MapTypeId.ROADMAP,
 		mapTypeControl:true,
@@ -13,6 +15,7 @@ function initialize() {
 	};
 	
 	var mapOptions2 = {
+		zoom:7,
 		center: latlng2,
 		mapTypeId: google.maps.MapTypeId.ROADMAP,
 		mapTypeControl:true,
@@ -22,15 +25,17 @@ function initialize() {
 	map = new google.maps.Map(document.getElementById("countryMap"),mapOptions);
 	
 	map2 = new google.maps.Map(document.getElementById("countryMap2"),mapOptions2);
-  loadStates();
+    loadStates();
 }
 
 function loadStates(){
     DWREngine._execute(_cfscriptLocation,null,'getMapStates',loadStatesResult);
 }
 
+
 function loadStatesResult(result){
   theBounds = new google.maps.LatLngBounds();
+  theBounds2 = new google.maps.LatLngBounds();
   for (i=0;i<result.length;i++){
     text = listingText.replace("@@props", result[i].PROPCNT);
     infoHTML = "<div id='infoWindow' style='text-align:left;'>" +
@@ -43,11 +48,7 @@ function loadStatesResult(result){
     createMarker(tmp,result[i].STATECODE, '', infoHTML);
   }
   document.getElementById("maplegend").innerHTML = "<br /><span style='color:#3e3e3e;font-size:14pt;'>" + mapSearch + "</span> - <span style='color:#3e3e3e;font-size:11pt;'>" + departmentText + "</span><br/>";
-  map.setCenter(theBounds.getCenter());
-  map.fitBounds(theBounds);
-  
-  map2.setCenter(theBounds.getCenter());
-  map2.fitBounds(theBounds);
+
 }
 
 function createMarker(coords, stateCode, cityCode, infoHTML) {
@@ -116,7 +117,12 @@ function createMarker(coords, stateCode, cityCode, infoHTML) {
 	google.maps.event.addListener(marker, 'click', function() {
 		infoWindow.open(map,marker);
 	});
+	
+	google.maps.event.addListener(marker2, 'click', function() {
+		infoWindow.open(map2,marker2);
+	});
 	mainArray.push(marker);
+	mainArray.push(marker2);
 	windows.push(infoWindow);	
   }
 }
@@ -149,7 +155,11 @@ function right(str, n)
 } 
 
 function getCities(stateCode){
-  stateCode = right('00'+ stateCode, 2);
+  if(stateCode > 9700){
+  	stateCode = stateCode;
+  }else{
+  	stateCode = right('00'+ stateCode, 2);
+  }
   DWREngine._execute(_cfscriptLocation,null,'getPropCountPerCity',stateCode,"",getCitiesResult);
 }
 
@@ -171,8 +181,6 @@ function getCitiesResult(result){
 	map.setCenter(cityBounds.getCenter());
 	map.fitBounds(cityBounds);
 	
-	map2.setCenter(cityBounds.getCenter());
-	map2.fitBounds(cityBounds);
 	if (result.length > 0 && result[i-1].CITYNAME.indexOf("Paris")>-1) {
     	document.getElementById("maplegend").innerHTML = "<span style='color:darkgrey;font-size:14pt;'>" + districtText + "</span><br/><a href='javascript:initialize();' style='color:red;text-decoration:none;font-size:10pt;'>" + backText + "</a>";
   	} else document.getElementById("maplegend").innerHTML = "<span style='color:darkgrey;font-size:14pt;'>" + cityText + "</span><br/><a href='javascript:initialize();' style='color:red;text-decoration:none;font-size:10pt;'>" + backText + "</a>";
