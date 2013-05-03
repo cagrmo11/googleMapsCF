@@ -1,11 +1,19 @@
+<cfprocessingdirective pageencoding="utf-8" />
 <cfoutput>
 <div id="maplegend" style="padding:0 0 10px 0;margin: 0 0 0 15px;"></div>
-<div id="countryMap" style="margin:0 ;width:778px;height:500px;border:1px solid grey;margin: 0 0 15px 10px;"></div>
-<div id="countryMap2" style="margin:0 ;width:180px;height:200px;border:1px solid grey;margin: 0 20px 15px 5px;float:right;"></div>
+<div id="maplegend2" style="padding:0 0 0px 0;margin: 48px 90px 0 0px;float:right;">
+    <span style='color:darkgrey;font-size:14pt;'>Choisissez: </span><br/><br/>
 
-//Defines variables including script location and language
+	<a href="javascript:initialize();" style='color:##3e3e3e;font-size:11pt;'>France</a><br/> <br/>
+	<span style='color:darkgrey;font-size:10pt;'>DOM-TOM</span><br/> 
+	<ul style="margin:0 0 0 13px">
+		<li><a href="javascript:initialize(2);" style='color:##3e3e3e;font-size:10pt;'>Réunion</a></li>
+		<li><a href="javascript:initialize(3);" style='color:##3e3e3e;font-size:10pt;'>Guadeloupe</a></li>
+	</ul>
+</div>
+<div id="countryMap" style="margin:0;width:775px;height:500px;border:1px solid grey;margin: 0 0 15px 10px;"></div>
 <script type="text/javascript">
-    var _map;
+	var _map;
     var _icon;
     var theBounds;
     var myself = "#myself#";
@@ -19,6 +27,7 @@
     var inList = "#lang.f_inList#";
     var mapSearch = "#lang.f_mapSearch#";
     var departmentText = "#lang.f_selectDepartmentOnMap#";
+    var reunion = "Reunion";
   	var _cfscriptLocation = "#variables.basehref#_model/components/ajaxFunctions.cfc";	
 </script>
 </cfoutput>
