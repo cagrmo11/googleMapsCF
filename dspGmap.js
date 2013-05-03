@@ -1,10 +1,12 @@
 
-var map, map2;
+var map;
 var mainArray = [];
 var windows = [];
-function initialize() {
-	var latlng = new google.maps.LatLng(46.199,5.21666);
-    	var latlng2 = new google.maps.LatLng(-21.1144,55.5325);
+var opt;
+function initialize(opt) {
+    var latlng = new google.maps.LatLng(46.199,5.21666);
+    var latlng2 = new google.maps.LatLng(-21.1144,55.5325);
+    var latlng3 = new google.maps.LatLng(16.25,-61.583333);
 	
 	var mapOptions = {
 		zoom:5,
@@ -15,16 +17,29 @@ function initialize() {
 	};
 	
 	var mapOptions2 = {
-		zoom:7,
+		zoom:9,
 		center: latlng2,
 		mapTypeId: google.maps.MapTypeId.ROADMAP,
 		mapTypeControl:true,
 		navigationControlOptions: {style: google.maps.NavigationControlStyle.SMALL}
 	};
 	
-	map = new google.maps.Map(document.getElementById("countryMap"),mapOptions);
+	var mapOptions3 = {
+		zoom:9,
+		center: latlng3,
+		mapTypeId: google.maps.MapTypeId.ROADMAP,
+		mapTypeControl:true,
+		navigationControlOptions: {style: google.maps.NavigationControlStyle.SMALL}
+	};
 	
-	map2 = new google.maps.Map(document.getElementById("countryMap2"),mapOptions2);
+	
+	if(opt == 3){
+		map = new google.maps.Map(document.getElementById("countryMap"),mapOptions3);
+	}else if(opt == 2){
+		map = new google.maps.Map(document.getElementById("countryMap"),mapOptions2);
+	}else{
+		map = new google.maps.Map(document.getElementById("countryMap"),mapOptions);
+	}
     loadStates();
 }
 
@@ -67,13 +82,7 @@ function createMarker(coords, stateCode, cityCode, infoHTML) {
 		title: cityCode
 	});
 	
-	var marker2 = new google.maps.Marker({
-		position: coords,
-		map: map2,
-		shadow: shadow,
-		icon: icon,
-		title: cityCode
-	});
+
     var infoWindow = new google.maps.InfoWindow({
 		content: infoHTML,
 		position: coords
@@ -81,14 +90,37 @@ function createMarker(coords, stateCode, cityCode, infoHTML) {
 	google.maps.event.addListener(marker, 'click', function() {
 		infoWindow.open(map,marker);
 	});
+
 	mainArray.push(marker);
 	windows.push(infoWindow);	
 	
   } else if(stateCode && stateCode.length >0) {
-  	leftPx = stateCode.charAt(0)*18;
-	topPx = stateCode.charAt(1)*18;
+  	
+  	if(stateCode < 9700){
+  		leftPx = stateCode.charAt(0)*18;
+		topPx = stateCode.charAt(1)*18;
+		size = 17;
+	}else if(stateCode > 9700 && stateCode < 9706){
+		if(stateCode.charAt(3) == 1){
+				leftPx = 0;	
+		}else if(stateCode.charAt(3) == 2){
+				leftPx = 30;
+		}else if(stateCode.charAt(3) == 3){
+				leftPx = 60;
+		}else if(stateCode.charAt(3) == 4){
+				leftPx = 89;
+		}else if(stateCode.charAt(3) == 5){
+				leftPx = 120;
+		}
+		topPx = 198;
+		size = 29;
+	}else{
+		leftPx = 150;
+		topPx = 180;
+		size = 29;
+	}
   	numberedIcon = new google.maps.MarkerImage('assets/images/mapIcons/mapIconSprite.png',
-		new google.maps.Size(17,17),
+		new google.maps.Size(size,17),
 		new google.maps.Point(leftPx,topPx),
 		new google.maps.Point(0,17));
 	shadow = new google.maps.MarkerImage('assets/images/mapIcons/mapIconSprite.png',
@@ -103,13 +135,6 @@ function createMarker(coords, stateCode, cityCode, infoHTML) {
 		title: stateCode
 	});
 	
-	var marker2 = new google.maps.Marker({
-		position: coords,
-		map: map2,
-		shadow: shadow,
-		icon: numberedIcon,
-		title: stateCode
-	});
     var infoWindow = new google.maps.InfoWindow({
 		content: infoHTML,
 		position: coords
@@ -118,11 +143,7 @@ function createMarker(coords, stateCode, cityCode, infoHTML) {
 		infoWindow.open(map,marker);
 	});
 	
-	google.maps.event.addListener(marker2, 'click', function() {
-		infoWindow.open(map2,marker2);
-	});
 	mainArray.push(marker);
-	mainArray.push(marker2);
 	windows.push(infoWindow);	
   }
 }
@@ -166,6 +187,7 @@ function getCities(stateCode){
 function getCitiesResult(result){
 	var cityBounds = new google.maps.LatLngBounds();
 	clearArr(mainArray);
+
 	clearWindows();
 	for (i = 0; i < result.length; i++) {
 		if (result[i].LAT.length > 0 && Math.abs(result[i].LAT) > 0 && result[i].LON.length > 0 && Math.abs(result[i].LON) > 0) {
@@ -178,8 +200,10 @@ function getCitiesResult(result){
 		}
 		
 	}
+	
 	map.setCenter(cityBounds.getCenter());
 	map.fitBounds(cityBounds);
+
 	
 	if (result.length > 0 && result[i-1].CITYNAME.indexOf("Paris")>-1) {
     	document.getElementById("maplegend").innerHTML = "<span style='color:darkgrey;font-size:14pt;'>" + districtText + "</span><br/><a href='javascript:initialize();' style='color:red;text-decoration:none;font-size:10pt;'>" + backText + "</a>";
